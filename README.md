@@ -1,0 +1,18 @@
+# FastAPI Movie catalog
+
+## Develop
+
+### Setup:
+
+Right click `movie-catalog` -> Mark directory as -> Sources Root 
+
+### Run:
+
+Go to work dir:
+```shell
+cd movie-catalog
+```
+Run dev server:
+```shell
+fastapi dev
+```
