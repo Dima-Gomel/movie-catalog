@@ -4,7 +4,6 @@ import random
 from fastapi import (
     APIRouter,
     status,
-    Form,
 )
 
 from .crud import MOVIES
@@ -13,8 +12,6 @@ from schemas.movie_url import (
     Movie,
     MovieCreate,
 )
-
-from typing import Annotated
 
 router = APIRouter(
     prefix="/movies",
@@ -36,6 +33,7 @@ def read_movie_details():
 )
 def create_movie(movie_create: MovieCreate):
 
+    # noinspection PyArgumentList
     return Movie(
         movie_id=random.randint(1, 20),
         **movie_create.model_dump(),
