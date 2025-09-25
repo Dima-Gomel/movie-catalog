@@ -8,16 +8,13 @@ class MovieBase(BaseModel):
     """
 
 
-class MovieCreate(MovieBase):
-    title: Annotated[str, ""]
-    year: Annotated[int, ""]
-    description: Annotated[str, ""]
-    genre: Annotated[str, ""]
-
-
 class Movie(MovieBase):
     """
     Модель фильма
     """
 
-    movie_id: int
+    slug: Annotated[str, ""]
+    title: Annotated[str, ""]
+    year: Annotated[int, ""]
+    description: Annotated[str, ""]
+    genre: Annotated[str, ""]
