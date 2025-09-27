@@ -7,6 +7,8 @@ class MovieBase(BaseModel):
     Базовый класс
     """
 
+    slug: str
+
 
 class Movie(MovieBase):
     """

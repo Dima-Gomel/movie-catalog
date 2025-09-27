@@ -1,6 +1,37 @@
+"""
+Create - создание
+Read - чтение
+Update - обновление
+Delete - удаление
+"""
+
+from pydantic import BaseModel
+
 from schemas.movie_url import Movie
 
-MOVIES = [
+
+class MovieStorage(BaseModel):
+    slug_to_movie_storage: dict[str, Movie] = {}
+
+    def get(self) -> list[Movie]:
+        return list(self.slug_to_movie_storage.values())
+
+    def get_by_slug(self, slug: str) -> Movie | None:
+        return self.slug_to_movie_storage.get(slug)
+
+    def create(self, movie_create: Movie) -> Movie:
+        movie_create = Movie(
+            **movie_create.model_dump(),
+        )
+
+        self.slug_to_movie_storage[movie_create.slug] = movie_create
+        return movie_create
+
+
+storage = MovieStorage()
+
+
+storage.create(
     Movie(
         slug="1",
         title="Москва слезам не верит",
@@ -12,7 +43,10 @@ MOVIES = [
         "но избранник ее оставляет. Однако она не опускает руки, в одиночку растит дочь и к тому же"
         "успевает делать блестящую карьеру. В 40 лет судьба дарит ей неожиданную встречу.",
         genre="драма, комедия",
-    ),
+    )
+)
+
+storage.create(
     Movie(
         slug="2",
         title="Живая сталь",
@@ -24,7 +58,10 @@ MOVIES = [
         "11-летний парень, оказывающийся его сыном. И по мере того, как машина пробивает свой путь"
         "к вершине, обретшие друг друга отец и сын учатся дружить.",
         genre="научно-фантастическая семейная драма",
-    ),
+    )
+)
+
+storage.create(
     Movie(
         slug="3",
         title="Великий уравнитель",
@@ -37,5 +74,5 @@ MOVIES = [
         "кто страдает от криминальных авторитетов, коррумпированных чиновников и не может найти помощи "
         "у государства, находят помощь в лице Макколла. Он поможет. Потому что он — великий уравнитель.",
         genre="боевик-триллер",
-    ),
-]
+    )
+)

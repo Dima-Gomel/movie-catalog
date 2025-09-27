@@ -1,12 +1,9 @@
-import random
-
-
 from fastapi import (
     APIRouter,
     status,
 )
 
-from .crud import MOVIES
+from .crud import storage
 
 from schemas.movie_url import (
     Movie,
@@ -22,7 +19,7 @@ router = APIRouter(
     response_model=list[Movie],
 )
 def read_movie_details():
-    return MOVIES
+    return storage.get()
 
 
 @router.post(
@@ -31,7 +28,4 @@ def read_movie_details():
     status_code=status.HTTP_201_CREATED,
 )
 def create_movie(movie_create: Movie):
-    # noinspection PyArgumentList
-    return Movie(
-        **movie_create.model_dump(),
-    )
+    return storage.create(movie_create)
