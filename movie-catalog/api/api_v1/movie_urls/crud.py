@@ -27,13 +27,19 @@ class MovieStorage(BaseModel):
         self.slug_to_movie_storage[movie_create.slug] = movie_create
         return movie_create
 
+    def delete_by_slug(self, slug: str) -> None:
+        self.slug_to_movie_storage.pop(slug, None)
+
+    def delete(self, movie: Movie) -> None:
+        self.delete_by_slug(slug=movie.slug)
+
 
 storage = MovieStorage()
 
 
 storage.create(
     Movie(
-        slug="1",
+        slug="moscow",
         title="Москва слезам не верит",
         year=1979,
         description="Москва, 1950-е годы. Три молодые провинциалки приезжают в Москву в поисках того,"
@@ -48,7 +54,7 @@ storage.create(
 
 storage.create(
     Movie(
-        slug="2",
+        slug="steel",
         title="Живая сталь",
         year=2011,
         description="События фильма происходят в будущем, где бокс запрещен за негуманностью и заменен боями"
@@ -63,7 +69,7 @@ storage.create(
 
 storage.create(
     Movie(
-        slug="3",
+        slug="great",
         title="Великий уравнитель",
         year=2014,
         description="Бывший агент ЦРУ, пожилой афроамериканец Роберт Макколл, решил начать жизнь заново,"

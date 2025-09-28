@@ -7,9 +7,12 @@ router = APIRouter()
 
 
 @router.get("/movie_slug/")
-def read_movie_slug(slug: str):
+def read_movie_slug(slug: str) -> Movie:
     movie: Movie | None = storage.get_by_slug(slug=slug)
+
     if movie:
         return movie
-
-    raise HTTPException(status_code=404, detail="Movie not found")
+    raise HTTPException(
+        status_code=404,
+        detail=f"Movie {slug!r} not found",
+    )
