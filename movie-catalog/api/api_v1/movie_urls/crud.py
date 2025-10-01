@@ -7,7 +7,10 @@ Delete - удаление
 
 from pydantic import BaseModel
 
-from schemas.movie_url import Movie
+from schemas.movie_url import (
+    Movie,
+    MovieUpdate,
+)
 
 
 class MovieStorage(BaseModel):
@@ -32,6 +35,15 @@ class MovieStorage(BaseModel):
 
     def delete(self, movie: Movie) -> None:
         self.delete_by_slug(slug=movie.slug)
+
+    def update(
+        self,
+        movie: Movie,
+        movie_in: MovieUpdate,
+    ) -> Movie:
+        for field_name, value in movie_in:
+            setattr(movie, field_name, value)
+        return movie
 
 
 storage = MovieStorage()

@@ -5,8 +5,8 @@ from fastapi.params import Depends
 from starlette import status
 
 from api.api_v1.movie_urls.crud import storage
-from schemas.movie_url import Movie
-
+from api.api_v1.movie_urls.dependencies import prefetch_movie
+from schemas.movie_url import Movie, MovieUpdate
 
 router = APIRouter(
     prefix="/{slug}",
@@ -25,17 +25,31 @@ router = APIRouter(
 )
 
 
+MovieBySlug = Annotated[
+    Movie,
+    Depends(prefetch_movie),
+]
+
+
 @router.get(
     "/",
+    response_model=Movie,
 )
-def read_movie_slug(slug: str) -> Movie:
-    movie: Movie | None = storage.get_by_slug(slug=slug)
+def read_movie_slug(movie: MovieBySlug) -> Movie:
+    return movie
 
-    if movie:
-        return movie
-    raise HTTPException(
-        status_code=404,
-        detail=f"Movie {slug!r} not found",
+
+@router.put(
+    "/",
+    response_model=Movie,
+)
+def update_movie_slug(
+    movie: MovieBySlug,
+    movie_in: MovieUpdate,
+) -> Movie:
+    return storage.update(
+        movie=movie,
+        movie_in=movie_in,
     )
 
 
@@ -44,9 +58,6 @@ def read_movie_slug(slug: str) -> Movie:
     status_code=status.HTTP_204_NO_CONTENT,
 )
 def delete_movie(
-    slug: Annotated[
-        Movie,
-        Depends(read_movie_slug),
-    ],
+    slug: MovieBySlug,
 ) -> None:
     storage.delete(movie=slug)
