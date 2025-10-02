@@ -16,7 +16,9 @@ class MovieBase(BaseModel):
 
 
 class MovieCreate(MovieBase):
-    """Модель для создания фильма"""
+    """
+    Модель для создания фильма
+    """
 
     slug: Annotation
 
@@ -38,6 +40,14 @@ class MoviePartialUpdate(MovieBase):
     genre: Annotation | None = None
 
 
+class MovieRead(MovieBase):
+    """
+    Модель для чтения данных о записи с фильмом
+    """
+
+    slug: str
+
+
 class Movie(MovieBase):
     """
     Модель фильма
@@ -48,3 +58,4 @@ class Movie(MovieBase):
     year: int
     description: str
     genre: str
+    notes: str = "Dima"

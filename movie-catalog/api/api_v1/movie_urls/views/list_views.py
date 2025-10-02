@@ -9,6 +9,7 @@ from api.api_v1.movie_urls.views.details_views import router as detail_router
 from schemas.movie_url import (
     Movie,
     MovieCreate,
+    MovieRead,
 )
 
 router = APIRouter(
@@ -20,7 +21,7 @@ router.include_router(detail_router)
 
 @router.get(
     "/",
-    response_model=list[Movie],
+    response_model=list[MovieRead],
 )
 def read_movie_details():
     return storage.get()
@@ -28,8 +29,8 @@ def read_movie_details():
 
 @router.post(
     "/",
-    response_model=MovieCreate,
+    response_model=MovieRead,
     status_code=status.HTTP_201_CREATED,
 )
-def create_movie(movie_create: Movie):
+def create_movie(movie_create: MovieCreate) -> Movie:
     return storage.create(movie_create)
