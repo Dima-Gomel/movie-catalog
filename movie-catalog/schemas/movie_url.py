@@ -1,17 +1,24 @@
 from pydantic import BaseModel
 from typing_extensions import Annotated
 
+Annotation = Annotated[str, ""]
+
 
 class MovieBase(BaseModel):
     """
     Базовый класс
     """
 
+    title: Annotation
+    year: Annotated[int, ""]
+    description: Annotation
+    genre: Annotation
+
 
 class MovieCreate(MovieBase):
     """Модель для создания фильма"""
 
-    slug: Annotated[str, ""]
+    slug: Annotation
 
 
 class MovieUpdate(MovieBase):
@@ -19,10 +26,16 @@ class MovieUpdate(MovieBase):
     Модель обновления фильма
     """
 
-    title: Annotated[str, ""]
-    year: Annotated[int, ""]
-    description: Annotated[str, ""]
-    genre: Annotated[str, ""]
+
+class MoviePartialUpdate(MovieBase):
+    """
+    Модель для частичного обновления фильма
+    """
+
+    title: Annotation | None = None
+    year: Annotated[int, ""] | None = None
+    description: Annotation | None = None
+    genre: Annotation | None = None
 
 
 class Movie(MovieBase):
