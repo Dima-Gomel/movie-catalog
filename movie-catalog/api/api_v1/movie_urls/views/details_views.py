@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import HTTPException, APIRouter
+from fastapi import APIRouter
 from fastapi.params import Depends
 from starlette import status
 
