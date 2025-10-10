@@ -5,6 +5,7 @@ Update - обновление
 Delete - удаление
 """
 
+import logging
 
 from pydantic import BaseModel, ValidationError
 
@@ -16,6 +17,8 @@ from schemas.movie_url import (
     MoviePartialUpdate,
 )
 
+log = logging.getLogger(__name__)
+
 
 class MovieStorage(BaseModel):
     slug_to_movie_storage: dict[str, Movie] = {}
@@ -24,12 +27,16 @@ class MovieStorage(BaseModel):
         MOVIE_CATALOG_STORAGE_FILEPATH.write_text(
             self.model_dump_json(indent=2), encoding="utf-8"
         )
+        log.info("Saved movie to storage file.")
 
     @classmethod
     def from_state(cls) -> "MovieStorage":
         if not MOVIE_CATALOG_STORAGE_FILEPATH.exists():
+            log.info("movie storage file doesn't exist.")
             return MovieStorage()
-        return cls.model_validate_json(MOVIE_CATALOG_STORAGE_FILEPATH.read_text())
+        return cls.model_validate_json(
+            MOVIE_CATALOG_STORAGE_FILEPATH.read_text(encoding="utf-8")
+        )
 
     def get(self) -> list[Movie]:
         return list(self.slug_to_movie_storage.values())
@@ -76,9 +83,12 @@ class MovieStorage(BaseModel):
 
 try:
     storage = MovieStorage.from_state()
+    log.warning("Recovered data from storage file.")
 except ValidationError:
     storage = MovieStorage()
     storage.save_state()
+    log.warning("Rewritten storage file due to validation error.")
+
 
 #
 # storage = MovieStorage()
