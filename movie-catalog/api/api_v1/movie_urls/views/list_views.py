@@ -1,6 +1,7 @@
 from fastapi import (
     status,
     APIRouter,
+    BackgroundTasks,
 )
 
 from api.api_v1.movie_urls.crud import storage
@@ -32,5 +33,9 @@ def read_movie_details():
     response_model=MovieRead,
     status_code=status.HTTP_201_CREATED,
 )
-def create_movie(movie_create: MovieCreate) -> Movie:
+def create_movie(
+    movie_create: MovieCreate,
+    background_tasks: BackgroundTasks,
+) -> Movie:
+    background_tasks.add_task(storage.save_state)
     return storage.create(movie_create)
