@@ -96,10 +96,7 @@ class MovieStorage(BaseModel):
 
 storage = MovieStorage()
 
-#
-# storage = MovieStorage()
-#
-#
+
 # storage.create(
 #     Movie(
 #         slug="moscow",
@@ -114,7 +111,7 @@ storage = MovieStorage()
 #         genre="драма, комедия",
 #     )
 # )
-#
+# #
 # storage.create(
 #     Movie(
 #         slug="steel",
