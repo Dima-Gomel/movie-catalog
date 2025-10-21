@@ -2,12 +2,16 @@ from typing import Annotated
 
 from fastapi import (
     APIRouter,
+    status,
+    Depends,
 )
-from fastapi.params import Depends
-from starlette import status
 
 from api.api_v1.movie_urls.crud import storage
-from api.api_v1.movie_urls.dependencies import prefetch_movie
+from api.api_v1.movie_urls.dependencies import (
+    prefetch_movie,
+    api_token_required,
+)
+
 from schemas.movie_url import (
     Movie,
     MovieUpdate,
@@ -53,6 +57,7 @@ def read_movie_slug(movie: MovieBySlug) -> Movie:
 def update_movie_slug(
     movie: MovieBySlug,
     movie_in: MovieUpdate,
+    _=Depends(api_token_required),
 ) -> Movie:
     return storage.update(
         movie=movie,
@@ -67,6 +72,7 @@ def update_movie_slug(
 def update_movie_partial(
     movie: MovieBySlug,
     movie_in: MoviePartialUpdate,
+    _=Depends(api_token_required),
 ) -> Movie:
     return storage.update_partial(
         movie=movie,
@@ -80,5 +86,6 @@ def update_movie_partial(
 )
 def delete_movie(
     movie: MovieBySlug,
+    _=Depends(api_token_required),
 ) -> None:
     storage.delete(movie=movie)

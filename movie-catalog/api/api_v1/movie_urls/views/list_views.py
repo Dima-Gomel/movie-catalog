@@ -5,7 +5,10 @@ from fastapi import (
 )
 
 from api.api_v1.movie_urls.crud import storage
-from api.api_v1.movie_urls.dependencies import save_storage_state
+from api.api_v1.movie_urls.dependencies import (
+    save_storage_state,
+    api_token_required,
+)
 from api.api_v1.movie_urls.views.details_views import router as detail_router
 
 from schemas.movie_url import (
@@ -37,5 +40,6 @@ def read_movie_details():
 )
 def create_movie(
     movie_create: MovieCreate,
+    _=Depends(api_token_required),
 ) -> Movie:
     return storage.create(movie_create)
