@@ -21,6 +21,7 @@ from schemas.movie_url import (
 
 router = APIRouter(
     prefix="/{slug}",
+    dependencies=[Depends(api_token_required)],
     responses={
         status.HTTP_404_NOT_FOUND: {
             "description": "Movie Not Found",
@@ -57,7 +58,6 @@ def read_movie_slug(movie: MovieBySlug) -> Movie:
 def update_movie_slug(
     movie: MovieBySlug,
     movie_in: MovieUpdate,
-    _=Depends(api_token_required),
 ) -> Movie:
     return storage.update(
         movie=movie,
@@ -72,7 +72,6 @@ def update_movie_slug(
 def update_movie_partial(
     movie: MovieBySlug,
     movie_in: MoviePartialUpdate,
-    _=Depends(api_token_required),
 ) -> Movie:
     return storage.update_partial(
         movie=movie,
@@ -86,6 +85,5 @@ def update_movie_partial(
 )
 def delete_movie(
     movie: MovieBySlug,
-    _=Depends(api_token_required),
 ) -> None:
     storage.delete(movie=movie)

@@ -5,7 +5,7 @@ from fastapi import (
     HTTPException,
     BackgroundTasks,
     Request,
-    Query,
+    Header,
     status,
 )
 
@@ -48,12 +48,17 @@ def save_storage_state(
 
 
 def api_token_required(
+    request: Request,
     api_token: Annotated[
         str,
-        Query(),
-    ],
+        Header(alias="x-auth-token"),
+    ] = "",
 ):
+    if request.method not in UNSAFE_METHODS:
+        return
+
     if api_token not in API_TOKENS:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid API token",
         )
