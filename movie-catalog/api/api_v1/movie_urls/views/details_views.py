@@ -10,6 +10,7 @@ from api.api_v1.movie_urls.crud import storage
 from api.api_v1.movie_urls.dependencies import (
     prefetch_movie,
     api_token_required,
+    user_basic_auth_required_for_unsafe_methods,
 )
 
 from schemas.movie_url import (
@@ -21,7 +22,8 @@ from schemas.movie_url import (
 
 router = APIRouter(
     prefix="/{slug}",
-    dependencies=[Depends(api_token_required)],
+    # dependencies=[Depends(api_token_required)],
+    dependencies=[Depends(user_basic_auth_required_for_unsafe_methods)],
     responses={
         status.HTTP_404_NOT_FOUND: {
             "description": "Movie Not Found",
