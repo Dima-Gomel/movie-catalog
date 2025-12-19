@@ -7,7 +7,8 @@ from fastapi import (
 from api.api_v1.movie_urls.crud import storage
 from api.api_v1.movie_urls.dependencies import (
     save_storage_state,
-    api_token_required,
+    user_basic_auth_required,
+    # api_token_required,
 )
 from api.api_v1.movie_urls.views.details_views import router as detail_router
 
@@ -21,7 +22,8 @@ router = APIRouter(
     prefix="/movies",
     dependencies=[
         Depends(save_storage_state),
-        Depends(api_token_required),
+        # Depends(api_token_required),
+        Depends(user_basic_auth_required),
     ],
     responses={
         status.HTTP_401_UNAUTHORIZED: {
@@ -52,6 +54,7 @@ def read_movie_details():
     "/",
     response_model=MovieRead,
     status_code=status.HTTP_201_CREATED,
+    # dependencies=[Depends(user_basic_auth_required)],
 )
 def create_movie(
     movie_create: MovieCreate,
