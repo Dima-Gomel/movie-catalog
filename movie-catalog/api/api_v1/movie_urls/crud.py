@@ -8,7 +8,9 @@ Delete - удаление
 import logging
 
 from pydantic import BaseModel, ValidationError
+from redis import Redis
 
+from core import config
 from core.config import MOVIE_CATALOG_STORAGE_FILEPATH
 
 from schemas.movie_url import (
@@ -18,6 +20,13 @@ from schemas.movie_url import (
 )
 
 log = logging.getLogger(__name__)
+
+redis = Redis(
+    host=config.REDIS_HOST,
+    port=config.REDIS_PORT,
+    db=config.REDIS_DB_MOVIE,
+    decode_responses=True,
+)
 
 
 class MovieStorage(BaseModel):
@@ -60,12 +69,19 @@ class MovieStorage(BaseModel):
     def get_by_slug(self, slug: str) -> Movie | None:
         return self.slug_to_movie_storage.get(slug)
 
-    def create(self, movie_create: Movie) -> Movie:
+    def create(
+        self,
+        movie_create: Movie,
+    ) -> Movie:
         movie_create = Movie(
             **movie_create.model_dump(),
         )
 
-        self.slug_to_movie_storage[movie_create.slug] = movie_create
+        redis.hset(
+            name=config.REDIS_MOVIE_HASH_NAME,
+            key=movie_create.slug,
+            value=movie_create.model_dump_json(),
+        )
         log.info("Create Movie %s", movie_create)
         return movie_create
 
@@ -95,50 +111,3 @@ class MovieStorage(BaseModel):
 
 
 storage = MovieStorage()
-
-
-# storage.create(
-#     Movie(
-#         slug="moscow",
-#         title="Москва слезам не верит",
-#         year=1979,
-#         description="Москва, 1950-е годы. Три молодые провинциалки приезжают в Москву в поисках того,"
-#         "что ищут люди во всех столицах мира — любви, счастья и достатка. Антонина выходит замуж,"
-#         "растит детей, любит мужа. Людмиле Москва представляется лотереей,"
-#         "в которой она должна выиграть свое особенное счастье. Катерина же отчаянно влюбляется,"
-#         "но избранник ее оставляет. Однако она не опускает руки, в одиночку растит дочь и к тому же"
-#         "успевает делать блестящую карьеру. В 40 лет судьба дарит ей неожиданную встречу.",
-#         genre="драма, комедия",
-#     )
-# )
-# #
-# storage.create(
-#     Movie(
-#         slug="steel",
-#         title="Живая сталь",
-#         year=2011,
-#         description="События фильма происходят в будущем, где бокс запрещен за негуманностью и заменен боями"
-#         "2000-фунтовых роботов, управляемых людьми. Бывший боксер, а теперь промоутер,"
-#         "переметнувшийся в Робобокс, решает, что наконец нашел своего чемпиона, когда ему попадается"
-#         "выбракованный, но очень способный робот. Одновременно на жизненном пути героя возникает"
-#         "11-летний парень, оказывающийся его сыном. И по мере того, как машина пробивает свой путь"
-#         "к вершине, обретшие друг друга отец и сын учатся дружить.",
-#         genre="научно-фантастическая семейная драма",
-#     )
-# )
-#
-# storage.create(
-#     Movie(
-#         slug="great",
-#         title="Великий уравнитель",
-#         year=2014,
-#         description="Бывший агент ЦРУ, пожилой афроамериканец Роберт Макколл, решил начать жизнь заново,"
-#         "оставить непростое прошлое и смотреть в будущее, как и обещал покойной жене. Он уже нашёл обычную"
-#         "работу продавца в магазине. Однажды Макколл вступается за юную проститутку Тери,"
-#         "с которой болтал в местной закусочной и которая находится под контролем русской мафии."
-#         "Макколл прекращает свою добровольную отставку и начинает самостоятельные поиски правосудия. Все,"
-#         "кто страдает от криминальных авторитетов, коррумпированных чиновников и не может найти помощи "
-#         "у государства, находят помощь в лице Макколла. Он поможет. Потому что он — великий уравнитель.",
-#         genre="боевик-триллер",
-#     )
-# )

@@ -18,8 +18,11 @@ from fastapi.security import (
 
 from .crud import storage
 from schemas.movie_url import Movie
-from api.api_v1.auth.services.redis_token_helper import redis_tokens
-from api.api_v1.auth.services.redis_users_helper import redis_users
+
+from api.api_v1.auth.services import (
+    redis_tokens,
+    redis_users,
+)
 
 log = logging.getLogger(__name__)
 
