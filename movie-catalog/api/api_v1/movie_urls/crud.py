@@ -29,6 +29,14 @@ redis = Redis(
 )
 
 
+def save_movie_in_redis(movie: Movie) -> Movie:
+    redis.hset(
+        name=config.REDIS_MOVIE_HASH_NAME,
+        key=movie.slug,
+        value=movie.model_dump_json(),
+    )
+
+
 class MovieStorage(BaseModel):
     slug_to_movie_storage: dict[str, Movie] = {}
 
@@ -89,12 +97,7 @@ class MovieStorage(BaseModel):
         movie_create = Movie(
             **movie_create.model_dump(),
         )
-
-        redis.hset(
-            name=config.REDIS_MOVIE_HASH_NAME,
-            key=movie_create.slug,
-            value=movie_create.model_dump_json(),
-        )
+        save_movie_in_redis(movie_create)
         log.info("Create Movie %s", movie_create)
         return movie_create
 
@@ -111,6 +114,7 @@ class MovieStorage(BaseModel):
     ) -> Movie:
         for field_name, value in movie_in:
             setattr(movie, field_name, value)
+        save_movie_in_redis(movie)
         return movie
 
     def update_partial(
@@ -120,6 +124,7 @@ class MovieStorage(BaseModel):
     ) -> Movie:
         for field_name, value in movie_in.model_dump(exclude_unset=True).items():
             setattr(movie, field_name, value)
+        save_movie_in_redis(movie)
         return movie
 
 
