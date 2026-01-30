@@ -11,8 +11,6 @@ from pydantic import BaseModel, ValidationError
 from redis import Redis
 
 from core import config
-from core.config import MOVIE_CATALOG_STORAGE_FILEPATH
-
 from schemas.movie_url import (
     Movie,
     MovieUpdate,
@@ -32,37 +30,6 @@ redis = Redis(
 class MovieStorage(BaseModel):
     slug_to_movie_storage: dict[str, Movie] = {}
 
-    def save_state(self) -> None:
-        MOVIE_CATALOG_STORAGE_FILEPATH.write_text(
-            self.model_dump_json(indent=2), encoding="utf-8"
-        )
-        log.info("Saved movie to storage file.")
-
-    @classmethod
-    def from_state(cls) -> "MovieStorage":
-        if not MOVIE_CATALOG_STORAGE_FILEPATH.exists():
-            log.info("movie storage file doesn't exist.")
-            return MovieStorage()
-        return cls.model_validate_json(
-            MOVIE_CATALOG_STORAGE_FILEPATH.read_text(encoding="utf-8")
-        )
-
-    def init_storage_from_state(self) -> None:
-        try:
-            data = MovieStorage.from_state()
-        except ValidationError:
-            self.save_state()
-            log.warning("Rewritten storage file due to validation error.")
-            return
-
-        # мы обновляем свойства напрямую
-        # если будут новые свойства
-        # то их тоже надо обновить
-        self.slug_to_movie_storage.update(
-            data.slug_to_movie_storage,
-        )
-        log.warning("Recovered data from storage file.")
-
     def save_movie(self, movie: Movie) -> None:
         redis.hset(
             name=config.REDIS_MOVIE_HASH_NAME,
@@ -75,12 +42,6 @@ class MovieStorage(BaseModel):
             Movie.model_validate_json(values)
             for values in redis.hvals(name=config.REDIS_MOVIE_HASH_NAME)
         ]
-        # values = redis.hvals(config.REDIS_MOVIE_HASH_NAME)
-        # movies = []
-        # for value in values:
-        #     movie = Movie.model_validate_json(value)
-        #     movies.append(movie)
-        # return movies
 
     def get_by_slug(self, slug: str) -> Movie | None:
         if data := redis.hget(
