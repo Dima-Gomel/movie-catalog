@@ -5,7 +5,7 @@ from fastapi import (
     HTTPException,
 )
 
-from api.api_v1.movie_urls.crud import storage
+from api.api_v1.movie_urls.crud import storage, MovieAlreadyExistsError
 from api.api_v1.movie_urls.dependencies import (
     api_token_or_url_required_for_unsafe_methods,
 )
@@ -51,14 +51,27 @@ def read_movie_details():
     "/",
     response_model=MovieRead,
     status_code=status.HTTP_201_CREATED,
+    responses={
+        status.HTTP_409_CONFLICT: {
+            "description": "A movie with the same name slug already exists.",
+            "content": {
+                "application/json": {
+                    "example": {
+                        "detail": "Movie with slug='name' already exists.",
+                    }
+                }
+            },
+        }
+    },
 )
 def create_movie(
     movie_create: MovieCreate,
 ) -> Movie:
-    if not storage.get_by_slug(movie_create.slug):
-        return storage.create(movie_create)
+    try:
+        return storage.create_or_raise_if_exists(movie_create)
 
-    raise HTTPException(
-        status_code=status.HTTP_409_CONFLICT,
-        detail="Movie with slug='foobar' already exists.",
-    )
+    except MovieAlreadyExistsError:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=f"Movie with slug={movie_create.slug!r} already exists.",
+        )

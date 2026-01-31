@@ -15,6 +15,7 @@ from schemas.movie_url import (
     Movie,
     MovieUpdate,
     MoviePartialUpdate,
+    MovieCreate,
 )
 
 log = logging.getLogger(__name__)
@@ -25,6 +26,18 @@ redis = Redis(
     db=config.REDIS_DB_MOVIE,
     decode_responses=True,
 )
+
+
+class MovieBaseError(Exception):
+    """
+    Base exception for movie CRUD actions.
+    """
+
+
+class MovieAlreadyExistsError(MovieBaseError):
+    """
+    Raised on movie creation if such slug already exists.
+    """
 
 
 class MovieStorage(BaseModel):
@@ -43,6 +56,12 @@ class MovieStorage(BaseModel):
             for values in redis.hvals(name=config.REDIS_MOVIE_HASH_NAME)
         ]
 
+    def exists(self, slug: str) -> bool:
+        return redis.hexists(
+            name=config.REDIS_MOVIE_HASH_NAME,
+            key=slug,
+        )
+
     def get_by_slug(self, slug: str) -> Movie | None:
         if data := redis.hget(
             name=config.REDIS_MOVIE_HASH_NAME,
@@ -52,7 +71,7 @@ class MovieStorage(BaseModel):
 
     def create(
         self,
-        movie_create: Movie,
+        movie_create: MovieCreate,
     ) -> Movie:
         movie_create = Movie(
             **movie_create.model_dump(),
@@ -60,6 +79,11 @@ class MovieStorage(BaseModel):
         self.save_movie(movie_create)
         log.info("Create Movie %s", movie_create)
         return movie_create
+
+    def create_or_raise_if_exists(self, movie_create: MovieCreate) -> Movie:
+        if not self.get_by_slug(movie_create.slug):
+            return self.create(movie_create)
+        raise MovieAlreadyExistsError(movie_create.slug)
 
     def delete_by_slug(self, slug: str) -> None:
         redis.hdel(
