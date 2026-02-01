@@ -34,3 +34,10 @@ def check(
         ),
     )
     print(token)
+
+
+@app.command()
+def list(
+    token: Annotated[str, "token"],
+):
+    print(f"[bold]{redis_tokens.get_tokens(token)}[/bold]")

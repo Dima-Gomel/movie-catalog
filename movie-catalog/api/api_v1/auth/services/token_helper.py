@@ -32,6 +32,17 @@ class AbstractTokenHelper(ABC):
         :return:
         """
 
+    @abstractmethod
+    def get_tokens(
+        self,
+        token: str,
+    ) -> str:
+        """
+        Get token from storage.
+        :param token:
+        :return:
+        """
+
     @classmethod
     def generate_token(cls) -> str:
         return secrets.token_urlsafe(16)

@@ -1,3 +1,5 @@
+from typing import List
+
 from redis import Redis
 
 from api.api_v1.auth.services.token_helper import AbstractTokenHelper
@@ -30,6 +32,10 @@ class RedisTokenHelper(AbstractTokenHelper):
 
     def add_token(self, token: str) -> None:
         self.redis.sadd(self.token_set, token)
+
+    def get_tokens(self, name: str) -> List[str]:
+        result = self.redis.smembers(name)
+        return list(result)
 
 
 redis_tokens = RedisTokenHelper(
