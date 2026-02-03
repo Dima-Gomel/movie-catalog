@@ -4,7 +4,7 @@ import typer
 from rich import print
 from rich.markdown import Markdown
 
-from api.api_v1.auth.services import redis_tokens
+from api.api_v1.auth.services import redis_tokens as tokens
 
 app = typer.Typer(
     name="token",
@@ -30,7 +30,7 @@ def check(
         f"Token [bold]{token}[/bold]",
         (
             "[bold green]exists.[/bold green]"
-            if redis_tokens.token_exists(token)
+            if tokens.token_exists(token)
             else "[bold red]doesn't exist.[/bold red]"
         ),
     )
@@ -43,19 +43,24 @@ def list_tokens():
     List all tokens.
     """
     print(Markdown("# Availabl API Tokens"))
-    print(Markdown("\n-".join([""] + redis_tokens.get_tokens())))
+    print(Markdown("\n- ".join([""] + tokens.get_tokens())))
     print()
 
 
 @app.command(name="add")
-def add_token(token: Annotated[str, str]):
+def add_token(
+    token: Annotated[
+        str,
+        typer.Argument(
+            help="The token to add.",
+        ),
+    ],
+):
     """
-    Create a new token.
+    Add the provided token to db.
     """
-    print(Markdown("# Add API Tokens"))
-    redis_tokens.add_token(token)
-    print(Markdown(f"## Token add: `{token}`"))
-    print(Markdown("**Save this token securely!**"))
+    tokens.add_token(token)
+    print(f"Token [bold]{token}[/bold] added to db.")
 
 
 @app.command(name="create")
@@ -63,18 +68,25 @@ def create_token():
     """
     Create a new token.
     """
-    print(Markdown("# Create API Tokens"))
-    tokens = redis_tokens.generate_token()
-    print(Markdown(f"# Token create: `{tokens}`"))
-    redis_tokens.add_token(tokens)
-    print(Markdown(f"Save token: `{tokens}`"))
+    new_token = tokens.generate_and_save_token()
+    print(f"new token: [bold green]{new_token}[/bold green] save to db.")
 
 
 @app.command(name="rm")
-def delete_token(token: Annotated[str, str]):
+def delete_token(
+    token: Annotated[
+        str,
+        typer.Argument(
+            help="The token to delete.",
+        ),
+    ],
+):
     """
-    Remove a token.
+    Delete the provided token from db.
     """
-    print(Markdown("# Remove API Tokens"))
-    redis_tokens.delete_token(token)
-    print(Markdown(f"## Token remove: `{token}`"))
+    if not tokens.token_exists(token):
+        print(f"Token [bold]{token} [red]does not exist[/red][/bold].")
+        return
+
+    tokens.delete_token(token)
+    print(f"Token [bold]{token}[/bold] removed from db.")
