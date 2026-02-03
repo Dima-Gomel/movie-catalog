@@ -33,12 +33,20 @@ class AbstractTokenHelper(ABC):
         """
 
     @abstractmethod
-    def get_tokens(
+    def get_tokens(self) -> list[str]:
+        """
+        Get all token.
+
+        :return:
+        """
+
+    @abstractmethod
+    def delete_token(
         self,
         token: str,
-    ) -> str:
+    ) -> None:
         """
-        Get token from storage.
+        Delete token.
         :param token:
         :return:
         """
