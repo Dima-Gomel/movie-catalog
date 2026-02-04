@@ -29,7 +29,7 @@ class MovieUpdate(MovieBase):
     """
 
 
-class MoviePartialUpdate(MovieBase):
+class MoviePartialUpdate(BaseModel):
     """
     Модель для частичного обновления фильма
     """

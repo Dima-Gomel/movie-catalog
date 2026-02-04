@@ -1,3 +1,7 @@
+__all__ = ("redis_tokens",)
+
+from typing import cast
+
 from redis import Redis
 
 from api.api_v1.auth.services.token_helper import AbstractTokenHelper
@@ -32,7 +36,12 @@ class RedisTokenHelper(AbstractTokenHelper):
         self.redis.sadd(self.token_set, token)
 
     def get_tokens(self) -> list[str]:
-        return list(self.redis.smembers(self.token_set))
+        return list(
+            cast(
+                set[str],
+                self.redis.smembers(self.token_set),
+            )
+        )
 
     def delete_token(self, token: str) -> None:
         self.redis.srem(self.token_set, token)

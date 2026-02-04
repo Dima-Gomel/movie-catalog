@@ -43,7 +43,7 @@ router.include_router(detail_router)
     "/",
     response_model=list[MovieRead],
 )
-def read_movie_details():
+def read_movie_details() -> list[Movie]:
     return storage.get()
 
 

@@ -5,7 +5,11 @@ Update - обновление
 Delete - удаление
 """
 
+__all__ = ("storage",)
+
 import logging
+from collections.abc import Iterable
+from typing import cast
 
 from pydantic import BaseModel, ValidationError
 from redis import Redis
@@ -53,13 +57,18 @@ class MovieStorage(BaseModel):
     def get(self) -> list[Movie]:
         return [
             Movie.model_validate_json(values)
-            for values in redis.hvals(name=config.REDIS_MOVIE_HASH_NAME)
+            for values in cast(
+                Iterable[str],
+                redis.hvals(name=config.REDIS_MOVIE_HASH_NAME),
+            )
         ]
 
     def exists(self, slug: str) -> bool:
-        return redis.hexists(
-            name=config.REDIS_MOVIE_HASH_NAME,
-            key=slug,
+        return bool(
+            redis.hexists(
+                name=config.REDIS_MOVIE_HASH_NAME,
+                key=slug,
+            )
         )
 
     def get_by_slug(self, slug: str) -> Movie | None:
@@ -67,18 +76,21 @@ class MovieStorage(BaseModel):
             name=config.REDIS_MOVIE_HASH_NAME,
             key=slug,
         ):
+            assert isinstance(data, str)
             return Movie.model_validate_json(data)
+
+        return None
 
     def create(
         self,
         movie_create: MovieCreate,
     ) -> Movie:
-        movie_create = Movie(
+        movie = Movie(
             **movie_create.model_dump(),
         )
-        self.save_movie(movie_create)
-        log.info("Create Movie %s", movie_create)
-        return movie_create
+        self.save_movie(movie)
+        log.info("Create Movie %s", movie)
+        return movie
 
     def create_or_raise_if_exists(self, movie_create: MovieCreate) -> Movie:
         if not self.get_by_slug(movie_create.slug):
