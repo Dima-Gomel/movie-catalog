@@ -1,7 +1,6 @@
 from fastapi import (
     APIRouter,
     Depends,
-    HTTPException,
     status,
 )
 from schemas.movie_url import (
@@ -10,7 +9,7 @@ from schemas.movie_url import (
     MovieRead,
 )
 
-from api.api_v1.movie_urls.crud import MovieAlreadyExistsError, storage
+from api.api_v1.movie_urls.crud import storage
 from api.api_v1.movie_urls.dependencies import (
     api_token_or_url_required_for_unsafe_methods,
 )
@@ -66,11 +65,4 @@ def read_movie_details() -> list[Movie]:
 def create_movie(
     movie_create: MovieCreate,
 ) -> Movie:
-    try:
-        return storage.create_or_raise_if_exists(movie_create)
-
-    except MovieAlreadyExistsError:
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail=f"Movie with slug={movie_create.slug!r} already exists.",
-        )
+    return storage.create_or_raise_if_exists(movie_create)
