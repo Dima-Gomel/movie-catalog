@@ -2,20 +2,19 @@ from typing import Annotated
 
 from fastapi import (
     APIRouter,
-    status,
     Depends,
+    status,
+)
+from schemas.movie_url import (
+    Movie,
+    MoviePartialUpdate,
+    MovieRead,
+    MovieUpdate,
 )
 
 from api.api_v1.movie_urls.crud import storage
 from api.api_v1.movie_urls.dependencies import (
     prefetch_movie,
-)
-
-from schemas.movie_url import (
-    Movie,
-    MovieUpdate,
-    MoviePartialUpdate,
-    MovieRead,
 )
 
 router = APIRouter(

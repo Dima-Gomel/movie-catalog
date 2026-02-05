@@ -7,21 +7,20 @@ from fastapi import (
     status,
 )
 from fastapi.params import Depends
-
 from fastapi.security import (
     HTTPAuthorizationCredentials,
-    HTTPBearer,
     HTTPBasic,
     HTTPBasicCredentials,
+    HTTPBearer,
 )
-
-from .crud import storage
 from schemas.movie_url import Movie
 
 from api.api_v1.auth.services import (
     redis_tokens,
     redis_users,
 )
+
+from .crud import storage
 
 log = logging.getLogger(__name__)
 

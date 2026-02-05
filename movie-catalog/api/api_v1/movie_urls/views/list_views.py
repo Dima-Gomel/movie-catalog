@@ -1,21 +1,20 @@
 from fastapi import (
-    status,
     APIRouter,
     Depends,
     HTTPException,
+    status,
 )
-
-from api.api_v1.movie_urls.crud import storage, MovieAlreadyExistsError
-from api.api_v1.movie_urls.dependencies import (
-    api_token_or_url_required_for_unsafe_methods,
-)
-from api.api_v1.movie_urls.views.details_views import router as detail_router
-
 from schemas.movie_url import (
     Movie,
     MovieCreate,
     MovieRead,
 )
+
+from api.api_v1.movie_urls.crud import MovieAlreadyExistsError, storage
+from api.api_v1.movie_urls.dependencies import (
+    api_token_or_url_required_for_unsafe_methods,
+)
+from api.api_v1.movie_urls.views.details_views import router as detail_router
 
 router = APIRouter(
     prefix="/movies",

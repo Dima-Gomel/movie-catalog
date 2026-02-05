@@ -11,15 +11,14 @@ import logging
 from collections.abc import Iterable
 from typing import cast
 
-from pydantic import BaseModel, ValidationError
-from redis import Redis
-
 from core import config
+from pydantic import BaseModel
+from redis import Redis
 from schemas.movie_url import (
     Movie,
-    MovieUpdate,
-    MoviePartialUpdate,
     MovieCreate,
+    MoviePartialUpdate,
+    MovieUpdate,
 )
 
 log = logging.getLogger(__name__)

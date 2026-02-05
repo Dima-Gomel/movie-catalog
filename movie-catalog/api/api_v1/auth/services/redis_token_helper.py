@@ -2,10 +2,10 @@ __all__ = ("redis_tokens",)
 
 from typing import cast
 
+from core import config
 from redis import Redis
 
 from api.api_v1.auth.services.token_helper import AbstractTokenHelper
-from core import config
 
 
 class RedisTokenHelper(AbstractTokenHelper):
