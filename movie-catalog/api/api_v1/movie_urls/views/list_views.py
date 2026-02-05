@@ -57,10 +57,10 @@ def read_movie_details() -> list[Movie]:
                 "application/json": {
                     "example": {
                         "detail": "Movie with slug='name' already exists.",
-                    }
-                }
+                    },
+                },
             },
-        }
+        },
     },
 )
 def create_movie(
