@@ -3,6 +3,7 @@ from unittest import TestCase
 from schemas.movie_url import (
     Movie,
     MovieCreate,
+    MoviePartialUpdate,
     MovieUpdate,
 )
 
@@ -67,5 +68,35 @@ class MovieUpdateTestCase(TestCase):
         )
         self.assertEqual(
             movie_in.genre,
+            movie.genre,
+        )
+
+
+class MoviePartialUpdateTestCase(TestCase):
+    def test_movie_can_be_created_from_partial_update_schema(self) -> None:
+        movie_in = MoviePartialUpdate(
+            title="some-title",
+            year=2026,
+            description="some-description",
+            genre="some-genre",
+        )
+        movie = Movie(
+            slug="some-slug",
+            **movie_in.model_dump(),
+        )
+        self.assertEqual(
+            movie_in.title or None,
+            movie.title,
+        )
+        self.assertEqual(
+            movie_in.year or None,
+            movie.year,
+        )
+        self.assertEqual(
+            movie_in.description or None,
+            movie.description,
+        )
+        self.assertEqual(
+            movie_in.genre or None,
             movie.genre,
         )
