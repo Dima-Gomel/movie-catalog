@@ -1,8 +1,15 @@
 from typing import Annotated
 
+from annotated_types import (
+    Len,
+    MaxLen,
+)
 from pydantic import BaseModel
 
-Annotation = Annotated[str, ""]
+DescriptionString = Annotated[
+    str,
+    MaxLen(200),
+]
 
 
 class MovieBase(BaseModel):
@@ -10,10 +17,10 @@ class MovieBase(BaseModel):
     Базовый класс
     """
 
-    title: Annotation
+    title: DescriptionString
     year: Annotated[int, ""]
-    description: Annotation
-    genre: Annotation
+    description: DescriptionString
+    genre: DescriptionString
 
 
 class MovieCreate(MovieBase):
@@ -21,7 +28,10 @@ class MovieCreate(MovieBase):
     Модель для создания фильма
     """
 
-    slug: Annotation
+    slug: Annotated[
+        str,
+        Len(min_length=3, max_length=10),
+    ]
 
 
 class MovieUpdate(MovieBase):
@@ -35,10 +45,10 @@ class MoviePartialUpdate(BaseModel):
     Модель для частичного обновления фильма
     """
 
-    title: Annotation | None = None
+    title: DescriptionString | None = None
     year: Annotated[int, ""] | None = None
-    description: Annotation | None = None
-    genre: Annotation | None = None
+    description: DescriptionString | None = None
+    genre: DescriptionString | None = None
 
 
 class MovieRead(MovieBase):
