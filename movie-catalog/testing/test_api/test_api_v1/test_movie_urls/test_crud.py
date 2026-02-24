@@ -2,11 +2,9 @@ import random
 from os import getenv
 from unittest import TestCase
 
-TESTING_ENV_ERROR = "Environment is not ready testing"
-
 if getenv("TESTING") != "1":
-    raise OSError(
-        TESTING_ENV_ERROR,
+    raise OSError(  # noqa: TRY003
+        "Environment is not ready for testing",  # noqa: EM101
     )
 
 
