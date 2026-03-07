@@ -236,3 +236,15 @@ class MoviePartialUpdateTestCase(TestCase):
             movie_in.genre or None,
             movie.genre,
         )
+
+    def test_empty_partial_update_returns_all_fields_none(self) -> None:
+        empty_movie = MoviePartialUpdate()
+
+        movie = empty_movie.model_dump()
+
+        self.assertIsNone(movie.get("title"))
+        self.assertIsNone(movie.get("year"))
+        self.assertIsNone(movie.get("description"))
+        self.assertIsNone(movie.get("genre"))
+
+        self.assertEqual(len(movie), 4)

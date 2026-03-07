@@ -12,8 +12,6 @@ if getenv("TESTING") != "1":
 class RedisTokenHelperTestCase(TestCase):
     def test_generate_and_save_token(self) -> None:
         new_token = redis_tokens.generate_and_save_token()
-        expected_token = True
-        self.assertEqual(
-            expected_token,
+        self.assertTrue(
             redis_tokens.token_exists(new_token),
         )
