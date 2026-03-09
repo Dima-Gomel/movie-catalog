@@ -8,7 +8,7 @@ from pydantic import BaseModel
 
 DescriptionString = Annotated[
     str,
-    MaxLen(200),
+    MaxLen(5000),
 ]
 
 
@@ -30,7 +30,7 @@ class MovieCreate(MovieBase):
 
     slug: Annotated[
         str,
-        Len(min_length=3, max_length=10),
+        Len(min_length=3, max_length=50),
     ]
 
 
