@@ -6,6 +6,7 @@ from typing import (
 )
 from unittest import TestCase
 
+import pytest
 from api.api_v1.movie_urls.crud import storage
 from schemas.movie_url import (
     Movie,
@@ -15,8 +16,8 @@ from schemas.movie_url import (
 )
 
 if getenv("TESTING") != "1":
-    raise OSError(  # noqa: TRY003
-        "Environment is not ready for testing",  # noqa: EM101
+    pytest.exit(
+        "Environment is not ready for testing",
     )
 
 
