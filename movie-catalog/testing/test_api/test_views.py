@@ -17,6 +17,7 @@ def test_root_view() -> None:
 @pytest.mark.parametrize(
     "name",
     [
+        # TODO: fake name
         "Jonn",
         "",
         "Jonn Smith",
