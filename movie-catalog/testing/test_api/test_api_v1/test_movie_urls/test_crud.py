@@ -1,9 +1,4 @@
-import random
-import string
-from collections.abc import Generator
-from typing import (
-    ClassVar,
-)
+from typing import ClassVar
 from unittest import TestCase
 
 import pytest
@@ -18,28 +13,7 @@ from schemas.movie_url import (
     MovieUpdate,
 )
 
-
-def create_movie() -> Movie:
-    movie_in = MovieCreate(
-        slug="".join(
-            random.choices(
-                string.ascii_letters,
-                k=8,
-            ),
-        ),
-        title="A movie title",
-        year=2000,
-        description="A movie description",
-        genre="A movie genre",
-    )
-    return storage.create(movie_in)
-
-
-@pytest.fixture()
-def movie() -> Generator[Movie]:
-    movie_create = create_movie()
-    yield movie_create
-    storage.delete(movie_create)
+from testing.conftest import create_movie
 
 
 class MovieStorageUpdateTestCase(TestCase):
